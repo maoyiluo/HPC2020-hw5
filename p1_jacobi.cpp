@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
     double **lutemp;
 
     // the geomatric informatin of current process.
-    int row = mpirank / N;
-    int col = mpirank % N;
+    int row = mpirank / sqrt(p);
+    int col = mpirank % sqrt(p);
 
 
     for (i = 0; i < lN + 2; i++)
