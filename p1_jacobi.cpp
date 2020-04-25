@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     int row = mpirank / N;
     int col = mpirank % N;
 
+
     for (i = 0; i < lN + 2; i++)
     {
         lu[i] = (double *)malloc(sizeof(double) * (lN + 2));
@@ -130,6 +131,7 @@ int main(int argc, char *argv[])
         if (row > 0)
         {
             /* If not the first row, send/recv bdry values to the process below */
+            printf('process: %d, send to: %d\n', mpirank, mpirank - process_per_line);
             memcpy(send_bottom_boundary, lunew[1], lN*sizeof(double));
             MPI_Isend(send_bottom_boundary, lN, MPI_DOUBLE, mpirank - process_per_line, iter, MPI_COMM_WORLD, send_bottom_quest);
             MPI_Irecv(receive_bottom_boundary, lN, MPI_DOUBLE, mpirank - process_per_line, iter, MPI_COMM_WORLD, receive_bottom_quest);
