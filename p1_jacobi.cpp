@@ -98,6 +98,12 @@ int main(int argc, char *argv[])
     MPI_Request *receive_bottom_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
     MPI_Request *receive_up_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
 
+    //request for send quest
+    MPI_Request *send_right_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
+    MPI_Request *send_left_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
+    MPI_Request *send_bottom_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
+    MPI_Request *send_up_quest =(MPI_Request*) malloc(sizeof(MPI_Request)); 
+
 
     double h = 1.0 / (N + 1);
     double hsq = h * h;
@@ -125,7 +131,7 @@ int main(int argc, char *argv[])
         {
             /* If not the first row, send/recv bdry values to the process below */
             memcpy(send_bottom_boundary, lunew[1], lN*sizeof(double));
-            MPI_Isend(send_bottom_boundary, lN, MPI_DOUBLE, mpirank - process_per_line, iter, MPI_COMM_WORLD);
+            MPI_Isend(send_bottom_boundary, lN, MPI_DOUBLE, mpirank - process_per_line, iter, MPI_COMM_WORLD, send_bottom_quest);
             MPI_Irecv(receive_bottom_boundary, lN, MPI_DOUBLE, mpirank - process_per_line, iter, MPI_COMM_WORLD, receive_bottom_quest);
         }
         if (col > 0)
@@ -134,29 +140,29 @@ int main(int argc, char *argv[])
             for(i = 1; i < lN; i++){
                 send_left_boundary[i] = lunew[i][1];
             }
-            MPI_Isend(send_left_boundary, lN, MPI_DOUBLE, mpirank - 1, iter, MPI_COMM_WORLD);
+            MPI_Isend(send_left_boundary, lN, MPI_DOUBLE, mpirank - 1, iter, MPI_COMM_WORLD, send_left_quest);
             MPI_Irecv(receive_left_boundary, lN, MPI_DOUBLE, mpirank - 1, iter, MPI_COMM_WORLD, receive_left_quest);
         }
         if(row < process_per_line - 1)
         {
             /*If not the last row, send/recv the up boundary to the process above*/
             memcpy(send_upper_boundary, lunew[lN], lN*sizeof(double));
-            MPI_Isend(send_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD);
+            MPI_Isend(send_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD, send_up_quest);
             MPI_Irecv(receive_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD, receive_up_quest);
         }
         if(col < process_per_line - 1){
             for(i = 1; i < lN; i++){
                 send_right_boundary[i] = lunew[i][lN];
             }
-            MPI_Isend(send_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD);
+            MPI_Isend(send_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD, send_right_quest);
             MPI_Irecv(receive_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD, receive_right_quest);
         }
 
         /*wait for the updated data*/
-        if(row > 0) wait_req(receive_bottom_quest);
-        if(row < process_per_line - 1) wait_req(receive_up_quest);
-        if(col > 0) wait_req(receive_left_quest);
-        if(col < process_per_line - 1) wait_req(receive_right_quest);
+        if(row > 0) MPI_Wait(receive_bottom_quest, &bottom_status);
+        if(row < process_per_line - 1) MPI_Wait(receive_up_quest, &up_status);
+        if(col > 0) MPI_Wait(receive_left_quest, &left_status);
+        if(col < process_per_line - 1) MPI_Wait(receive_right_quest, &right_status);
 
         /* use the recevice value to update our lunew*/
         for(i = 1; i < lN; i++){
