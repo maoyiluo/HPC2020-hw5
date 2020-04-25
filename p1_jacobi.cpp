@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < lN + 2; i++)
     {
-        lu[i] = (double **)malloc(sizeof(double) * lN + 2);
-        lunew[i] = (double **)malloc(sizeof(double * lN + 2));
+        lu[i] = (double *)malloc(sizeof(double) * (lN + 2));
+        lunew[i] = (double *)malloc(sizeof(double) * (lN + 2));
     }
 
     //initialize the local matrix.
