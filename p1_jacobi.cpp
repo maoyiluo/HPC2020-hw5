@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
         {
             for (j = 1; j < lN; j++)
             {
-                lunew[i] = 0.25 * (hsq + lu[i][j - 1] + lu[i][j + 1] + lu[i - 1][j] + lu[i + 1][j]);
+                lunew[i][j] = 0.25 * (hsq + lu[i][j - 1] + lu[i][j + 1] + lu[i - 1][j] + lu[i + 1][j]);
             }
         }
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         if (col > 0)
         {
             /* If not the first col, send/recv bdry values to the left */
-            for(i = 1; i < lu; i++){
+            for(i = 1; i < lN; i++){
                 send_left_boundary[i] = lunew[i][1];
             }
             MPI_Send(send_left_boundary, lN, MPI_DOUBLE, mpirank - 1, iter, MPI_COMM_WORLD);
@@ -139,11 +139,11 @@ int main(int argc, char *argv[])
             MPI_Recv(receive_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD);
         }
         if(col < process_per_line){
-            for(i = 1; i < lu; i++){
+            for(i = 1; i < lN; i++){
                 send_right_boundary[i] = lunew[i][lN];
             }
             MPI_Send(send_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD);
-            MPI_Recv(receive_right_boundary, lN, MPI_DOUBEL, mpirank + 1, iter, MPI_COMM_WORLD);
+            MPI_Recv(receive_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD);
         }
 
         /* use the recevice value to update our lunew*/
