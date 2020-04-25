@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
     sscanf(argv[2], "%d", &max_iters);
 
     /* compute number of unknowns handled by each process */
-    lN = N / sqrt(p);
     process_per_line = sqrt(p);
-    if ((N % sqrt(p) != 0) && mpirank == 0)
+    lN = N / process_per_line;
+    if ((N % process_per_line != 0) && mpirank == 0)
     {
         printf("N: %d, local N: %d\n", N, lN);
         printf("Exiting. N must be a multiple of p\n");
@@ -56,18 +56,18 @@ int main(int argc, char *argv[])
     double tt = MPI_Wtime();
 
     /* Allocation of vectors, including left/upper and right/lower ghost points */
-    double **lu = (double *)calloc(sizeof(double *), lN + 2);
-    double **lunew = (double *)calloc(sizeof(double *), lN + 2);
+    double **lu = (double **)calloc(sizeof(double *), lN + 2);
+    double **lunew = (double **)calloc(sizeof(double *), lN + 2);
     double **lutemp;
 
     // the geomatric informatin of current process.
-    int row = mpi_rank / N;
-    int col = mpi_rank % N;
+    int row = mpirank / N;
+    int col = mpirank % N;
 
     for (i = 0; i < lN + 2; i++)
     {
-        lu[i] = (double *)malloc(sizeof(double), lN + 2);
-        lunew[i] = (double *)malloc(sizeof(double, lN + 2));
+        lu[i] = (double **)malloc(sizeof(double) * lN + 2);
+        lunew[i] = (double **)malloc(sizeof(double * lN + 2));
     }
 
     //initialize the local matrix.
