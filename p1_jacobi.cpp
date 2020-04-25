@@ -81,16 +81,16 @@ int main(int argc, char *argv[])
     }
 
     //buffer for sending
-    double *send_right_boundary = (double *)malloc(sizeof(double), lN);
-    double *send_left_boundary = (double *)malloc(sizeof(double), lN);
-    double *send_upper_boundary = (double *)malloc(sizeof(double), lN);
-    double *send_bottom_boundary = (double *)malloc(sizeof(double), lN);
+    double *send_right_boundary = (double *)malloc(sizeof(double) * lN);
+    double *send_left_boundary = (double *)malloc(sizeof(double) * lN);
+    double *send_upper_boundary = (double *)malloc(sizeof(double) * lN);
+    double *send_bottom_boundary = (double *)malloc(sizeof(double) * lN);
 
     //buffer for receiving
-    double *receive_right_boundary = (double *)malloc(sizeof(double), lN);
-    double *receive_left_boundary = (double *)malloc(sizeof(double), lN);
-    double *receive_upper_boundary = (double *)malloc(sizeof(double), lN);
-    double *receive_bottom_boundary = (double *)malloc(sizeof(double), lN);
+    double *receive_right_boundary = (double *)malloc(sizeof(double) * lN);
+    double *receive_left_boundary = (double *)malloc(sizeof(double) * lN);
+    double *receive_upper_boundary = (double *)malloc(sizeof(double) * lN);
+    double *receive_bottom_boundary = (double *)malloc(sizeof(double) * lN);
 
 
     double h = 1.0 / (N + 1);
@@ -136,14 +136,14 @@ int main(int argc, char *argv[])
             /*If not the last row, send/recv the up boundary to the process above*/
             memcpy(send_upper_boundary, lunew[lN], lN*sizeof(double));
             MPI_Send(send_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD);
-            MPI_Recv(receive_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD);
+            MPI_Recv(receive_upper_boundary, lN, MPI_DOUBLE, mpirank + process_per_line, iter, MPI_COMM_WORLD, &up_status);
         }
         if(col < process_per_line){
             for(i = 1; i < lN; i++){
                 send_right_boundary[i] = lunew[i][lN];
             }
             MPI_Send(send_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD);
-            MPI_Recv(receive_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD);
+            MPI_Recv(receive_right_boundary, lN, MPI_DOUBLE, mpirank + 1, iter, MPI_COMM_WORLD, &right_status);
         }
 
         /* use the recevice value to update our lunew*/
