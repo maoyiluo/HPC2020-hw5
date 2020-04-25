@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 
     // the geomatric informatin of current process.
     int process_per_row = sqrt(p);
-    int row = mpirank / sqrt(p);
-    int col = mpirank % sqrt(p);
+    int row = mpirank / process_per_row;
+    int col = mpirank % process_per_row;
 
 
     for (i = 0; i < lN + 2; i++)
