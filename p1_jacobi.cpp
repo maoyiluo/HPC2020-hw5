@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
         {
             for (j = 1; j < lN; j++)
             {
-                lunew[i][j] = 0.25 * (-hsq + lu[i][j - 1] + lu[i][j + 1] + lu[i - 1][j] + lu[i + 1][j]);
+                lunew[i][j] = 0.25 * (hsq + lu[i][j - 1] + lu[i][j + 1] + lu[i - 1][j] + lu[i + 1][j]);
             }
         }
 
