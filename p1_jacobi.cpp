@@ -16,7 +16,7 @@ double compute_residual(double **lu, int lN, double invhsq)
     for (i = 1; i <= lN; i++)
     {
         tmp = 0;
-        for (j = 1; j <= lN; j++){
+        for (j = 1; j <= lN; j++)
             tmp +=((-lu[i][j - 1] - lu[i][j + 1] + 4.0 * lu[i][j] - lu[i - 1][j] - lu[i + 1][j]) * invhsq - 1);
         lres += tmp * tmp;
     }
