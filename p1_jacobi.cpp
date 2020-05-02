@@ -184,14 +184,6 @@ int main(int argc, char *argv[])
         lutemp = lu;
         lu = lunew;
         lunew = lutemp;
-        if (0 == (iter % 10))
-        {
-            gres = compute_residual(lu, lN, invhsq);
-            if (0 == mpirank)
-            {
-                printf("Iter %d: Residual: %g\n", iter, gres);
-            }
-        }
     }
 
     /* Clean up */
