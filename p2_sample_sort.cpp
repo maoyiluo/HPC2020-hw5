@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     // send-displacement for the message to process (i+1) is then given by,
     // sdispls[i+1] = std::lower_bound(vec, vec+N, s[i]) - vec;
     int *send_displacement = (int *)malloc(p * sizeof(int));
-    int *bucket_size = (int *)malloc(p * sizeof(int));
+    int *bucket_size_each_process = (int *)malloc(p * sizeof(int));
     send_displacement[0] = 0;
     for (int i = 0; i < p - 1; i++)
     {
@@ -131,22 +131,22 @@ int main(int argc, char *argv[])
     }
     for (int i = 0; i < p-1; i++)
     {
-        bucket_size[i] = send_displacement[i + 1] - send_displacement[i];
+        bucket_size_each_process[i] = send_displacement[i + 1] - send_displacement[i];
     }
-    bucket_size[p-1] = N - send_displacement[p-1];
+    bucket_size_each_process[p-1] = N - send_displacement[p-1];
     int *receive_bucket_size = (int *)malloc((p - 1) * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
-    MPI_Alltoall(bucket_size, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
+    MPI_Alltoall(bucket_size_each_process, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
     output_to_file(rank, 2, receive_bucket_size, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
     {
-        bucket_size += receive_displacement[i];
+        bucket_size += receive_bucket_size[i];
     }
-    int *bucket = (int *)malloc(bucket_size * sizeof(int));
+    int *bucket = (int *)malloc(receive_bucket_size * sizeof(int));
     // do a local sort of the received data
 
     // every process writes its result to a file
