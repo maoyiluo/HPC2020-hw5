@@ -138,7 +138,6 @@ int main(int argc, char *argv[])
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
-    output_to_file(rank, 2, receive_bucket_size, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
     {
