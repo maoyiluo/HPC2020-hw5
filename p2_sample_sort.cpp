@@ -65,6 +65,9 @@ int main(int argc, char *argv[])
 
     // sample p-1 entries from vector as the local splitters, i.e.,
     // every N/P-th entry of the sorted vector
+
+    double tt = MPI_Wtime();
+
     int *sample = (int *)malloc(p * sizeof(int));
     for (int i = 0; i < p - 1; i++)
         sample[i] = vec[N / p * i];
@@ -78,16 +81,6 @@ int main(int argc, char *argv[])
     if (rank == 0)
         gathered_sample = (int *)malloc(p * (p - 1) * sizeof(int));
     MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-    if (rank == 0)
-    {
-        printf("gathered sample: \n");
-        for (int i = 0; i < p * (p - 1); i++)
-        {
-            printf("%d ", gathered_sample[i]);
-        }
-        printf("\n");
-    }
 
     // root process does a sort and picks (p-1) splitters (from the
     // p(p-1) received elements)
@@ -133,6 +126,7 @@ int main(int argc, char *argv[])
     int *receive_bucket_size = (int *)malloc(p * sizeof(int));
     int *receive_displacement = (int *)malloc(p * sizeof(int));
     MPI_Alltoall(bucket_size_each_process, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
+
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
@@ -144,7 +138,7 @@ int main(int argc, char *argv[])
     receive_displacement[0] = 0;
     for (int i = 1; i < p; i++)
     {
-        receive_displacement[i] = receive_displacement[i-1] + receive_bucket_size[i-1];
+        receive_displacement[i] = receive_displacement[i - 1] + receive_bucket_size[i - 1];
     }
     int *bucket = (int *)malloc(bucket_size * sizeof(int));
 
@@ -153,6 +147,7 @@ int main(int argc, char *argv[])
     // every process writes its result to a file
     std::sort(bucket, bucket + bucket_size);
     output_to_file(rank, 3, bucket, bucket_size);
+    printf("Time elapsed is %f seconds.\n", elapsed);
     free(vec);
     MPI_Finalize();
     return 0;
