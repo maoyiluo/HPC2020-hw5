@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
     {
         double total_time = 0;
         for(int i = 0; i < p; i++) total_time += all_elapsed_time[i];
-        printf("time:%d \n", total_time);
+        printf("time:%f \n", total_time);
     }
     free(vec);
     MPI_Finalize();
