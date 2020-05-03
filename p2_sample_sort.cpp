@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     {
         all_elapsed_time = (double *)malloc(p * sizeof(double));
     }
-    MPI_Gather(&elapsed, 1, MPI_INT, all_elapsed_time, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gather(&elapsed, 1, MPI_DOUBLE, all_elapsed_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     if (rank == 0)
     {
         double total_time = 0;
