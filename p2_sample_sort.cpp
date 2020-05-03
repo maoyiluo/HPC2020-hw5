@@ -147,9 +147,20 @@ int main(int argc, char *argv[])
     // every process writes its result to a file
     std::sort(bucket, bucket + bucket_size);
     output_to_file(rank, 3, bucket, bucket_size);
-        MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     double elapsed = MPI_Wtime() - tt;
-    printf("Time elapsed is %f seconds.\n", elapsed);
+    double *all_elapsed_time;
+    if (rank == 0)
+    {
+        all_elapsed_time = (double *)malloc(p * sizeof(double));
+    }
+    MPI_Gather(&elapsed, 1, MPI_INT, all_elapsed_time, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    if (rank == 0)
+    {
+        double total_time = 0;
+        for(int i = 0; i < p; i++) total_time += all_elapsed_time[i];
+        printf("time:%d \n", total_time);
+    }
     free(vec);
     MPI_Finalize();
     return 0;
