@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-int output_to_file(int rank, int type, int *array, int N)
+void output_to_file(int rank, int type, int *array, int N)
 {
     FILE *fd = NULL;
     char filename[256];
@@ -27,11 +27,10 @@ int output_to_file(int rank, int type, int *array, int N)
     if (NULL == fd)
     {
         printf("Error opening file \n");
-        return 1;
     }
 
     fprintf(fd, "rank %d received the message:\n", rank);
-    for (n = 0; n < N; ++n)
+    for (int n = 0; n < N; ++n)
         fprintf(fd, "  %f\n", message_in[n]);
 
     fclose(fd);
