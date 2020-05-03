@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
     receive_displacement[0] = 0;
     for (int i = 1; i < p; i++)
     {
-        receive_displacement[i] = receive_displacement[i-1] + receive_bucket_size[i];
+        receive_displacement[i] = receive_displacement[i-1] + receive_bucket_size[i-1];
     }
     int *bucket = (int *)malloc(bucket_size * sizeof(int));
 
