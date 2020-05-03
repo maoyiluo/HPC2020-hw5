@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     // root process broadcasts splitters to all other processes
     MPI_Barrier(MPI_COMM_WORLD); 
-    MPI_Bcast(&splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     output_to_file(rank, 1, splitters, p-1);
     // every process uses the obtained splitters to decide which
