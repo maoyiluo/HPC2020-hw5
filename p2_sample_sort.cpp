@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     {
         send_displacement[i] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
     }
-    output_to_file(rank, 2, send_displacement, p);
+    output_to_file(rank, 3, send_displacement, p);
     int *receive_displacement = (int *)malloc((p) * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
