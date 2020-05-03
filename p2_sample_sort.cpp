@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-void output_to_file(int rank, int type, int *array, int N)
+int output_to_file(int rank, int type, int *array, int N)
 {
     FILE *fd = NULL;
     char filename[256];
