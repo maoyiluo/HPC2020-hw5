@@ -65,14 +65,14 @@ int main(int argc, char *argv[])
 
     output_to_file(rank, 0, vec, N);
 
-    // sort locally
-    std::sort(vec, vec + N);
-
     // sample p-1 entries from vector as the local splitters, i.e.,
     // every N/P-th entry of the sorted vector
     int *sample = (int *)malloc(p * sizeof(int));
     for (int i = 0; i < p - 1; i++)
         sample[i] = vec[N / p * i];
+
+    // sort locally
+    std::sort(vec, vec + N);
 
     // every process communicates the selected entries to the root
     // process; use for instance an MPI_Gather
