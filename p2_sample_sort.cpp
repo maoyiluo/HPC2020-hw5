@@ -147,8 +147,9 @@ int main(int argc, char *argv[])
         bucket_size += receive_bucket_size[i];
     }
     int *bucket = (int *)malloc(bucket_size * sizeof(int));
-    // do a local sort of the received data
 
+    MPI_Alltoallv(vec, N, send_displacement, MPI_INT, bucket, bucket_size, receive_bucket_size, MPI_INT, MPI_COMM_WORLD);
+    // do a local sort of the received data
     // every process writes its result to a file
 
     free(vec);
