@@ -106,10 +106,8 @@ int main(int argc, char *argv[])
     }
 
     // root process broadcasts splitters to all other processes
-    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    output_to_file(rank, 1, splitters, p - 1);
     // every process uses the obtained splitters to decide which
     // integers need to be sent to which other process (local bins).
     // Note that the vector is already locally sorted and so are the
@@ -122,6 +120,7 @@ int main(int argc, char *argv[])
     // counts and displacements. For a splitter s[i], the corresponding
     // send-displacement for the message to process (i+1) is then given by,
     // sdispls[i+1] = std::lower_bound(vec, vec+N, s[i]) - vec;
+
     int *send_displacement = (int *)malloc(p * sizeof(int));
     int *bucket_size_each_process = (int *)malloc(p * sizeof(int));
     send_displacement[0] = 0;
@@ -129,26 +128,31 @@ int main(int argc, char *argv[])
     {
         send_displacement[i + 1] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
     }
-    for (int i = 0; i < p-1; i++)
+    for (int i = 0; i < p - 1; i++)
     {
         bucket_size_each_process[i] = send_displacement[i + 1] - send_displacement[i];
     }
-    bucket_size_each_process[p-1] = N - send_displacement[p-1];
+    bucket_size_each_process[p - 1] = N - send_displacement[p - 1];
     int *receive_bucket_size = (int *)malloc((p - 1) * sizeof(int));
+    int *receive_displacement = (int *)malloc(p * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
     MPI_Alltoall(bucket_size_each_process, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
     output_to_file(rank, 2, receive_bucket_size, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
     {
         bucket_size += receive_bucket_size[i];
     }
+    receive_displacement[0] = 0;
+    for (int i = 1; i < p; i++)
+    {
+        receive_displacement[i] = receive_displacement[i-1] + receive_bucket_size[i];
+    }
     int *bucket = (int *)malloc(bucket_size * sizeof(int));
 
-    MPI_Alltoallv(vec, N, send_displacement, MPI_INT, bucket, bucket_size, receive_bucket_size, MPI_INT, MPI_COMM_WORLD);
+    MPI_Alltoallv(vec, bucket_size_each_process, send_displacement, MPI_INT, bucket, receive_bucket_size, receive_displacement, MPI_INT, MPI_COMM_WORLD);
     // do a local sort of the received data
     // every process writes its result to a file
 
