@@ -11,7 +11,7 @@ void output_to_file(int rank, int type, int *array, int N)
     char filename[256];
     if (type == 0)
     {
-        snprintf(filename, 256, "gather_sample%02d.txt", rank);
+        snprintf(filename, 256, "data%02d.txt", rank);
     }
     else if (type == 1)
     {
@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
     {
         vec[i] = rand();
     }
-    printf("rank: %d, first entry: %d\n", rank, vec[0]);
+
+    output_to_file(rank, 0, vec, N);
 
     // sort locally
     std::sort(vec, vec + N);
@@ -121,14 +122,14 @@ int main(int argc, char *argv[])
     send_displacement[0] = 0;
     for (int i = 0; i < p - 1; i++)
     {
-        send_displacement[i + 1] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
+        send_displacement[i] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
     }
     int *receive_displacement = (int *)malloc((p) * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
-    MPI_Alltoall(send_displacement, p, MPI_INT, receive_displacement, p, MPI_INT, MPI_COMM_WORLD);
-     MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Alltoall(send_displacement, 1, MPI_INT, receive_displacement, 1, MPI_INT, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD); 
     output_to_file(rank, 2, receive_displacement, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
