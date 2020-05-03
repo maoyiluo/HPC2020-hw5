@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     {
         bucket_size += receive_bucket_size[i];
     }
-    int *bucket = (int *)malloc(receive_bucket_size * sizeof(int));
+    int *bucket = (int *)malloc(bucket_size * sizeof(int));
     // do a local sort of the received data
 
     // every process writes its result to a file
