@@ -30,7 +30,7 @@ void output_to_file(int rank, int type, int *array, int N)
         return 1;
     }
 
-    fprintf(fd, "rank %d received from %d the message:\n", rank, origin);
+    fprintf(fd, "rank %d received the message:\n", rank);
     for (n = 0; n < N; ++n)
         fprintf(fd, "  %f\n", message_in[n]);
 
