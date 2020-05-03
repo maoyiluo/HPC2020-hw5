@@ -17,9 +17,11 @@ void output_to_file(int rank, int type, int *array, int N)
     {
         snprintf(filename, 256, "splitters%02d.txt", rank);
     }
-    else
+    else if(type == 2)
     {
         snprintf(filename, 256, "alltoall%02d.txt", rank);
+    }else{
+        snprintf(filename, 256, "send%02d.txt", rank);
     }
 
     fd = fopen(filename, "w+");
@@ -124,6 +126,7 @@ int main(int argc, char *argv[])
     {
         send_displacement[i] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
     }
+    output_to_file(rank, 2, send_displacement, p);
     int *receive_displacement = (int *)malloc((p) * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
