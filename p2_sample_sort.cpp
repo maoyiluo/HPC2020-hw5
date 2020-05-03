@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
     MPI_Alltoallv(vec, bucket_size_each_process, send_displacement, MPI_INT, bucket, receive_bucket_size, receive_displacement, MPI_INT, MPI_COMM_WORLD);
     // do a local sort of the received data
     // every process writes its result to a file
-
+    std::sort(bucket, bucket + bucket_size);
     output_to_file(rank, 3, bucket, bucket_size);
     free(vec);
     MPI_Finalize();
