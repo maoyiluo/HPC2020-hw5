@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
     int *gathered_sample;
     if (rank == 0)
         gathered_sample = (int *)malloc(p * (p - 1) * sizeof(int));
-    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (rank == 0)
@@ -135,10 +134,10 @@ int main(int argc, char *argv[])
     bucket_size_each_process[p - 1] = N - send_displacement[p - 1];
     int *receive_bucket_size = (int *)malloc(p * sizeof(int));
     int *receive_displacement = (int *)malloc(p * sizeof(int));
+    MPI_Alltoall(bucket_size_each_process, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
-    MPI_Alltoall(bucket_size_each_process, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
     output_to_file(rank, 2, receive_bucket_size, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
