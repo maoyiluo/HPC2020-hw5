@@ -5,15 +5,15 @@
 #include <stdlib.h>
 #include <algorithm>
 
-void output_to_file(int rank, std::string type, int *array, int N)
+void output_to_file(int rank, int type, int *array, int N)
 {
     FILE *fd = NULL;
     char filename[256];
-    if (type == "gather_sample")
+    if (type == 0)
     {
         snprintf(filename, 256, "gather_sample%02d.txt", rank);
     }
-    else if (type == "splitters")
+    else if (type == 1)
     {
         snprintf(filename, 256, "splitters%02d.txt", rank);
     }
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     // root process broadcasts splitters to all other processes
     MPI_Bcast(&splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
-    output_to_file(rank, "splitters", splitters, p-1);
+    output_to_file(rank, 1, splitters, p-1);
     // every process uses the obtained splitters to decide which
     // integers need to be sent to which other process (local bins).
     // Note that the vector is already locally sorted and so are the
