@@ -23,7 +23,7 @@ void output_to_file(int rank, int type, int *array, int N)
     }
     else
     {
-        snprintf(filename, 256, "send%02d.txt", rank);
+        snprintf(filename, 256, "result%02d.txt", rank);
     }
 
     fd = fopen(filename, "w+");
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
         bucket_size_each_process[i] = send_displacement[i + 1] - send_displacement[i];
     }
     bucket_size_each_process[p - 1] = N - send_displacement[p - 1];
-    int *receive_bucket_size = (int *)malloc((p - 1) * sizeof(int));
+    int *receive_bucket_size = (int *)malloc(p * sizeof(int));
     int *receive_displacement = (int *)malloc(p * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
     // do a local sort of the received data
     // every process writes its result to a file
 
+    output_to_file(rank, 3, bucket, bucket_size);
     free(vec);
     MPI_Finalize();
     return 0;
