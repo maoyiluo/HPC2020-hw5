@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     // sdispls[i+1] = std::lower_bound(vec, vec+N, s[i]) - vec;
     int *send_displacement = (int *)malloc(p * sizeof(int));
     send_displacement[0] = 0;
-    for (int i = 0; i < p - 1; i++)
+    for (int i = 0; i < p; i++)
     {
         send_displacement[i] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
     }
