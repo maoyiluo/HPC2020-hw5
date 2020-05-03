@@ -17,10 +17,12 @@ void output_to_file(int rank, int type, int *array, int N)
     {
         snprintf(filename, 256, "splitters%02d.txt", rank);
     }
-    else if(type == 2)
+    else if (type == 2)
     {
         snprintf(filename, 256, "alltoall%02d.txt", rank);
-    }else{
+    }
+    else
+    {
         snprintf(filename, 256, "send%02d.txt", rank);
     }
 
@@ -77,8 +79,8 @@ int main(int argc, char *argv[])
     int *gathered_sample;
     if (rank == 0)
         gathered_sample = (int *)malloc(p * (p - 1) * sizeof(int));
-    MPI_Barrier(MPI_COMM_WORLD);    
-    MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, MPI_INT,0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (rank == 0)
     {
@@ -104,10 +106,10 @@ int main(int argc, char *argv[])
     }
 
     // root process broadcasts splitters to all other processes
-    MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    output_to_file(rank, 1, splitters, p-1);
+    output_to_file(rank, 1, splitters, p - 1);
     // every process uses the obtained splitters to decide which
     // integers need to be sent to which other process (local bins).
     // Note that the vector is already locally sorted and so are the
@@ -121,19 +123,24 @@ int main(int argc, char *argv[])
     // send-displacement for the message to process (i+1) is then given by,
     // sdispls[i+1] = std::lower_bound(vec, vec+N, s[i]) - vec;
     int *send_displacement = (int *)malloc(p * sizeof(int));
+    int *bucket_size = (int *)malloc(p * sizeof(int));
     send_displacement[0] = 0;
+    for (int i = 0; i < p - 1; i++)
+    {
+        send_displacement[i + 1] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
+    }
     for (int i = 0; i < p-1; i++)
     {
-        send_displacement[i] = std::lower_bound(vec, vec + N, splitters[i]) - vec;
+        bucket_size[i] = send_displacement[i + 1] - send_displacement[i];
     }
-    output_to_file(rank, 3, send_displacement, p-1);
-    int *receive_displacement = (int *)malloc((p-1) * sizeof(int));
+    bucket_size[p-1] = N - send_displacement[p-1];
+    int *receive_bucket_size = (int *)malloc((p - 1) * sizeof(int));
     // send and receive: first use an MPI_Alltoall to share with every
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
-    MPI_Alltoall(send_displacement, 1, MPI_INT, receive_displacement, 1, MPI_INT, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD); 
-    output_to_file(rank, 2, receive_displacement, p-1);
+    MPI_Alltoall(bucket_size, 1, MPI_INT, receive_bucket_size, 1, MPI_INT, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    output_to_file(rank, 2, receive_bucket_size, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
     {
