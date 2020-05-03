@@ -128,6 +128,7 @@ int main(int argc, char *argv[])
     // process how many integers it should expect, and then use
     // MPI_Alltoallv to exchange the data
     MPI_Alltoall(&send_displacement, p, MPI_INT, receive_displacement, p, MPI_INT, MPI_COMM_WORLD);
+    output_to_file(rank, 2, receive_displacement, p);
     int bucket_size = 0;
     for (int i = 0; i < p; i++)
     {
