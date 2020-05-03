@@ -63,8 +63,6 @@ int main(int argc, char *argv[])
         vec[i] = rand();
     }
 
-    output_to_file(rank, 0, vec, N);
-
     // sample p-1 entries from vector as the local splitters, i.e.,
     // every N/P-th entry of the sorted vector
     int *sample = (int *)malloc(p * sizeof(int));
