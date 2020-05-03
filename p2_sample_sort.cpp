@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
     int *gathered_sample;
     if (rank == 0)
         gathered_sample = (int *)malloc(p * (p - 1) * sizeof(int));
+    MPI_Barrier(MPI_COMM_WORLD);    
     MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, MPI_INT,0, MPI_COMM_WORLD);
 
     if (rank == 0)
@@ -101,7 +102,7 @@ int main(int argc, char *argv[])
 
     // root process broadcasts splitters to all other processes
     MPI_Bcast(&splitters, p - 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
+
     output_to_file(rank, 1, splitters, p-1);
     // every process uses the obtained splitters to decide which
     // integers need to be sent to which other process (local bins).
