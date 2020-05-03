@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     int *vec = (int *)malloc(N * sizeof(int));
     // seed random number generator differently on every core
-    srand((unsigned int)(rank + 393919));
+    srand((unsigned int)(rank + 10);//393919));
 
     // fill vector with random integers
     for (int i = 0; i < N; ++i)
