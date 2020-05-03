@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     int *gathered_sample;
     if (rank == 0)
         gathered_sample = (int *)malloc(p * (p - 1) * sizeof(int));
-    MPI_gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, 0, MPI_COMM_WORLD);
+    MPI_Gather(sample, p - 1, MPI_INT, gathered_sample, p - 1, 0, MPI_COMM_WORLD);
 
     if (rank == 0)
     {
